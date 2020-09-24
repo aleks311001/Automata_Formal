@@ -61,15 +61,15 @@ private:
     std::unordered_map<long long, size_t> getMapConfigurationToNumber_();
     /**
      * Make big configuration for new NKA, as a subset of set all configurations
-     * @param configurations subset all configurations
-     * @param indexesConfigs map: configuration -> number
+     * @param [in] configurations subset all configurations
+     * @param [in] indexesConfigs map: configuration -> number
      * @return new configuration
      */
     static long long makeConfigurationFromOthers_(const std::set<long long>& configurations,
                                                   const std::unordered_map<long long, size_t>& indexesConfigs);
     /**
      * Check that set of configurations has accepting configuration
-     * @param configurations checked configurations
+     * @param [in] configurations checked configurations
      * @return result of check
      */
     bool checkSetConfigsOnAccepting_(const std::set<long long>& configurations);
@@ -77,8 +77,43 @@ private:
     void writeConfigurations_(std::ofstream& file,
                               std::unordered_map<long long, size_t>& numsConfigurations,
                               int r);
+    void writeEdge_(std::ofstream& file, std::string word,
+                    long long startConf, long long finishConf,
+                    std::unordered_map<long long, std::set<long long>>& daddies,
+                    std::unordered_map<long long, size_t>& numsConfigurations);
+    std::unordered_map<long long, std::set<long long>> findDaddies();
     void writeTransitions_(std::ofstream& file,
                            std::unordered_map<long long, size_t>& numsConfigurations);
+
+    /// Create new configurations and edges from old accepting configurations to this
+    void makeOneAcceptingConfiguration_();
+    /// Replace EPS to "1"
+    void replaceEpsilonToOne_();
+    /// For all edges w1,..., w_k from q1 to q2 make one edge w1+w2+...+w_k from q1 to q2 and delete old edges
+    void makeOneEdgeForAllPairs_();
+    /**
+     * Add brackets to string, if len of string > 1
+     * @param [in] string
+     */
+    static std::string getBracketedExpression_(const std::string& string);
+    /**
+     * Add brackets and star to string
+     * @param [in] string
+     */
+    static std::string getStarsExpression_(const  std::string& string);
+
+    /**
+     * Union left, loop, right in \f$ left (loop)^* right \f$
+     * @param [in] left, loop, right text on edges
+     * @return result union edge
+     */
+    static std::string unionEdgeLoopEdge(const std::string& left, const std::string& loop, const std::string& right);
+    /**
+     * Replace all paths \f$ q_1 \xrightarrow{edge_{left}} conf \xrightarrow{loop} conf \xrightarrow{edge_{right}} q_2 \f$
+     * on edge \f$ q_1 \xrightarrow{edge_{left} (loop)^{*} edge_{right}} q_2 \f$
+     * @param [in] conf skipping configuration
+     */
+    void skipConfiguration_(long long conf);
 
 public:
     NKA(long long q0 = 0,
@@ -98,10 +133,20 @@ public:
     void addTransition(long long left, const std::string& word, long long right);
     void addAcceptingConfiguration(long long add);
 
-    void delConfiguration(long long del);
+    /*void delConfiguration(long long del);
     void delSymbol(char del);
     void delTransition(long long left, const std::string& word, long long right);
-    void delAcceptingConfiguration(long long del);
+    void delAcceptingConfiguration(long long del);*/
+
+    /**
+     * Generate and add unique configuration
+     * @param [in] min generated configuration greater then this
+     * @return added configuration
+     */
+    long long addNewConfiguration(long long min = 0);
+
+    /// Replace multi symbols edge on single-symbol edges
+    void replaceMultiSymbolsEdges();
 
     /// Change all epsilon transitions on one-letter.
     void changeEpsTransitions();
@@ -115,7 +160,21 @@ public:
     void makeExplicitWays();
     void makeDKA();
 
-    void createTexFileThisNKA(const std::string& filename, int r);
+    void makeFullDKAFromDKA();
+    void makeAntiDKAFromFullDKA();
+
+    void createTexFileThisNKA(const std::string& filename, double r, bool writeRegular = true);
+
+    void addRegularSymbols() {
+        alphabet_.insert('+');
+        alphabet_.insert('*');
+        alphabet_.insert('(');
+        alphabet_.insert(')');
+        alphabet_.insert('1');
+        alphabet_.insert('^');
+    }
+
+    std::string makeRegular();
 };
 
 
