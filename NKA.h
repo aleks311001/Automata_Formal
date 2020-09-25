@@ -20,7 +20,9 @@
 const std::string EPS = ""; ///< Epsilon word
 
 /**
- *
+ * @brief NKA class
+ * @details This class can make DKA, full DKA, anti DKA, regular expression and draw in file automata.
+ * @public
  */
 class NKA {
 private:
@@ -192,11 +194,13 @@ public:
     /**
      * Add configuration "add"
      * @param [in] add added configuration
+     * @throw invalid_argument if added configuration already contains
      */
     void addConfiguration(long long add);
     /**
      * Add a symbol in alphabet
      * @param [in] add added symbol
+     * @throw invalid_argument if added symbol already contains
      */
     void addSymbol(char add);
     /**
@@ -204,13 +208,21 @@ public:
      * @param [in] left start of edge configuration
      * @param [in] word value on edge
      * @param [in] right finish of edge configuration
+     * @throw invalid_argument if added configuration or word does not contains in configurations or alphabet
      */
     void addTransition(long long left, const std::string& word, long long right);
     /**
      * Make configuration "add" accepting
      * @param add made configuration
+     * @throw invalid_argument if added configuration already contains in accepting configuration
      */
     void addAcceptingConfiguration(long long add);
+    /**
+     * Delete configuration "add" from accepting
+     * @param del deleted configuration
+     * @throw invalid_argument if deleted configuration does not contains in accepting configuration
+     */
+    void delAcceptingConfiguration(long long del);
 
     /**
      * Generate and add unique configuration
@@ -236,9 +248,9 @@ public:
     /**
      * Make DKA. Call:
      * @code
-     * replaceMultiSymbolsEdges();
-     * changeEpsTransitions();
-     * makeExplicitWays();
+     *     replaceMultiSymbolsEdges();
+     *     changeEpsTransitions();
+     *     makeExplicitWays();
      * @endcode
      */
     void makeDKA();
@@ -251,9 +263,9 @@ public:
     /**
      * @brief Create file with this NKA.
      * @details Write alphabet, q0, accepting configurations and draw NKA
-     * @param filename name of created file
-     * @param r radius of configurations circle
-     * @param writeRegular if true make and write in file regular expression
+     * @param [in] filename name of created file
+     * @param [in] r radius of configurations circle
+     * @param [in] writeRegular if true make and write in file regular expression
      */
     void createTexFileThisNKA(const std::string& filename, double r, bool writeRegular = true);
 

@@ -1,0 +1,71 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=1.5cm,right=1.5cm,top=1.75cm,bottom=1.75cm]{geometry}
+
+\newcommand{\timelimit}{}
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+
+
+\begin{document}
+\pagestyle{empty}
+\noindent
+    $\Sigma = \left\{a, b\right\}$\\
+    $q_0 = 0$\\
+    $F = \left\{1, 2, 4, 5, 6, 7, 8, 10\right\}$
+
+\begin{tikzpicture}[->, >=stealth', on grid, auto, node distance = 2.5cm, every state/.style={thick, fill=gray!20}]    \node [state, initial] (0) at (-5, 6.12323e-16) {0};
+    \node [state, accepting] (1) at (-4.20627, -2.7032) {1};
+    \node [state, accepting] (2) at (-2.07708, -4.54816) {2};
+    \node [state] (3) at (0.711574, -4.94911) {3};
+    \node [state, accepting] (4) at (3.2743, -3.77875) {4};
+    \node [state, accepting] (5) at (4.79746, -1.40866) {5};
+    \node [state, accepting] (6) at (4.79746, 1.40866) {6};
+    \node [state, accepting] (7) at (3.2743, 3.77875) {7};
+    \node [state, accepting] (8) at (0.711574, 4.94911) {8};
+    \node [state] (9) at (-2.07708, 4.54816) {9};
+    \node [state, accepting] (10) at (-4.20627, 2.7032) {10};
+
+    \path
+        (6) 
+            edge node {$b$} (2)
+            edge [bend left = 20] node {$a$} (10)
+        (10) 
+            edge [loop left] node {$a$} (10)
+            edge [bend left = 20] node {$b$} (6)
+        (5) 
+            edge node {$b$} (2)
+            edge [bend left = 20] node {$a$} (9)
+        (4) 
+            edge node {$b$} (2)
+            edge [bend left = 20] node {$a$} (8)
+        (7) 
+            edge node {$b$} (4)
+            edge [bend left = 20] node {$a$} (9)
+        (8) 
+            edge node {$a$} (10)
+            edge [bend left = 20] node {$b$} (4)
+        (2) 
+            edge [loop below] node {$b$} (2)
+            edge node {$a$} (3)
+        (3) 
+            edge node {$a$} (7)
+        (1) 
+            edge node {$b$} (2)
+            edge node {$a$} (3)
+        (9) 
+            edge [bend left = 20] node {$a$} (7)
+            edge [bend left = 20] node {$b$} (5)
+        (0) 
+            edge node {$a$} (1);
+\end{tikzpicture}
+
+$(((((((ab)b^*a+aa)a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*a)+(((ab)b^*a+aa)a)(b((bb^*a)a))^*a)(((b((bb^*a)a)+a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*a)+(b((bb^*a)a)+a)(b((bb^*a)a))^*a+ba)^*(((b((bb^*a)a)+a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*a)+((((ab)b^*a+aa)a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*a)((((b((bb^*a)a))(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*a)+(b((bb^*a)a))(b((bb^*a)a))^*a)(((b((bb^*a)a)+a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*a)+(b((bb^*a)a)+a)(b((bb^*a)a))^*a+ba)^*(((b((bb^*a)a)+a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*a)+((b((bb^*a)a))(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*a+ba+a)^*((((b((bb^*a)a))(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*a)+(b((bb^*a)a))(b((bb^*a)a))^*a)(((b((bb^*a)a)+a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*a)+(b((bb^*a)a)+a)(b((bb^*a)a))^*a+ba)^*(((b((bb^*a)a)+a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*(b(bb^*+1)+1)+b(bb^*+1)+1)+(b((bb^*a)a)+a)(b((bb^*a)a))^*(b(bb^*+1)+1)+b(bb^*+1))+((b((bb^*a)a))(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*(b(bb^*+1)+1)+b(bb^*+1)+1)+(b((bb^*a)a))(b((bb^*a)a))^*(b(bb^*+1)+1)+b(bb^*+1)+1)+(((((ab)b^*a+aa)a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*a)+(((ab)b^*a+aa)a)(b((bb^*a)a))^*a)(((b((bb^*a)a)+a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*a)+(b((bb^*a)a)+a)(b((bb^*a)a))^*a+ba)^*(((b((bb^*a)a)+a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*(b(bb^*+1)+1)+b(bb^*+1)+1)+(b((bb^*a)a)+a)(b((bb^*a)a))^*(b(bb^*+1)+1)+b(bb^*+1))+((((ab)b^*a+aa)a)(b((bb^*a)a))^*(ba))((b((bb^*a)a))(b((bb^*a)a))^*(ba)+ba)^*((b((bb^*a)a))(b((bb^*a)a))^*(b(bb^*+1)+1)+b(bb^*+1)+1)+(((ab)b^*a+aa)a)(b((bb^*a)a))^*(b(bb^*+1)+1)+(ab)b^*+a)$
+\end{document}

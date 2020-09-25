@@ -125,13 +125,13 @@ void NKA::delTransition(long long left, const std::string& word, long long right
             transitions_.erase(left);
         }
     }
-}
+}*/
 void NKA::delAcceptingConfiguration(long long del) {
     if (!configurations_.contains(del)) {
         throw std::invalid_argument("accepting configurations does not contains deleted configuration");
     }
     acceptingConfigurations_.erase(del);
-}*/
+}
 
 long long NKA::addNewConfiguration(long long min) {
     for (long long i = min; ; ++i) {
