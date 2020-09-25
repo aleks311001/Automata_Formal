@@ -1,0 +1,44 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=1.5cm,right=1.5cm,top=1.75cm,bottom=1.75cm]{geometry}
+
+\newcommand{\timelimit}{}
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+
+
+\begin{document}
+\pagestyle{empty}
+\noindent
+    $\Sigma = \left\{a, b\right\}$\\
+    $q_0 = 0$\\
+    $F = \left\{1\right\}$
+
+\begin{tikzpicture}[->, >=stealth', on grid, auto, node distance = 2.5cm, every state/.style={thick, fill=gray!20}]    \node [state, accepting] (1) at (-9.18485e-16, -5) {1};
+    \node [state, initial] (0) at (-5, 6.12323e-16) {0};
+    \node [state] (2) at (5, -1.22465e-15) {2};
+    \node [state] (3) at (1.53081e-15, 5) {3};
+
+    \path
+        (1) 
+            edge [loop below] node {$b+a$} (1)
+        (2) 
+            edge node {$b$} (1)
+            edge [bend left = 20] node {$a$} (0)
+        (3) 
+            edge node {$a$} (1)
+            edge [bend left = 20] node {$b$} (0)
+        (0) 
+            edge [bend left = 20] node {$b$} (2)
+            edge [bend left = 20] node {$a$} (3);
+\end{tikzpicture}
+
+$(ab+ba)^*(a(a(b+a)^*)+b(b(b+a)^*))$
+\end{document}

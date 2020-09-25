@@ -1,0 +1,46 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=1.5cm,right=1.5cm,top=1.75cm,bottom=1.75cm]{geometry}
+
+\newcommand{\timelimit}{}
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+
+
+\begin{document}
+\pagestyle{empty}
+\noindent
+    $\Sigma = \left\{a, b\right\}$\\
+    $q_0 = 0$\\
+    $F = \left\{1, 2, 4\right\}$
+
+\begin{tikzpicture}[->, >=stealth', on grid, auto, node distance = 2.5cm, every state/.style={thick, fill=gray!20}]    \node [state, initial] (0) at (-5, 6.12323e-16) {0};
+    \node [state, accepting] (1) at (-1.54508, -4.75528) {1};
+    \node [state, accepting] (2) at (4.04508, -2.93893) {2};
+    \node [state] (3) at (4.04508, 2.93893) {3};
+    \node [state, accepting] (4) at (-1.54508, 4.75528) {4};
+
+    \path
+        (3) 
+            edge [bend left = 20] node {$b+a$} (2)
+        (2) 
+            edge [bend left = 20] node {$b+a$} (3)
+        (4) 
+            edge [loop above] node {$a$} (4)
+        (1) 
+            edge node {$a$} (4)
+            edge [loop below] node {$ab$} (1)
+        (0) 
+            edge node {$\varepsilon$} (1)
+            edge node {$\varepsilon$} (2);
+\end{tikzpicture}
+
+$(((ab)^*a)a^*+((b+a))((b+a)(b+a))^*((b+a))+(ab)^*+1)$
+\end{document}

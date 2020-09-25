@@ -15,6 +15,17 @@ NKA::NKA(long long q0,
         q0_(q0),
         acceptingConfigurations_(acceptingConfigurations) {}
 
+NKA::NKA(long long q0,
+         const std::set<char>& alphabet,
+         long long numConfigurations,
+         const std::set<long long int>& acceptingConfigurations,
+         const NKA::TransitionsType& transitions):
+         NKA(q0, alphabet, std::set<long long>(), acceptingConfigurations, transitions) {
+    for (int i = 0; i < numConfigurations; ++i) {
+        configurations_.insert(i);
+    }
+}
+
 NKA::NKA(const NKA& other):
         configurations_(other.configurations_),
         alphabet_(other.alphabet_),
@@ -45,10 +56,6 @@ NKA& NKA::operator=(NKA&& other) {
     transitions_ = std::move(other.transitions_);
 
     return *this;
-}
-
-void NKA::changeQ0(long long q0) {
-    q0_ = q0;
 }
 
 void NKA::addConfiguration(long long add) {
@@ -235,11 +242,13 @@ void NKA::delEmptyConfigurations() {
     configurations_ = std::move(newConfigurations);
     configurations_.insert(q0_);
 
+    std::set<long long> newAcceptingConfigurations;
     for (auto conf: acceptingConfigurations_) {
-        if (!configurations_.contains(conf)) {
-            acceptingConfigurations_.erase(conf);
+        if (configurations_.contains(conf)) {
+            newAcceptingConfigurations.insert(conf);
         }
     }
+    acceptingConfigurations_ = std::move(newAcceptingConfigurations);
 }
 
 std::unordered_map<long long, size_t> NKA::getMapConfigurationToNumber_() {
@@ -278,9 +287,9 @@ bool NKA::checkSetConfigsOnAccepting_(const std::set<long long int>& configurati
 }
 
 void NKA::makeExplicitWays() {
-    if (configurations_.size() > std::numeric_limits<long long>::digits) {
+    if (configurations_.size() > std::numeric_limits<long long>::digits - 1) {
         delEmptyConfigurations();
-        if (configurations_.size() > std::numeric_limits<long long>::digits) {
+        if (configurations_.size() > std::numeric_limits<long long>::digits - 1) {
             throw std::range_error("number of configurations over max");
         }
     }
@@ -350,6 +359,10 @@ void NKA::makeFullDKAFromDKA() {
             }
         }
     }
+
+    for (auto& symbol: alphabet_) {
+        addTransition(newConf, std::string(&symbol, 1), newConf);
+    }
 }
 
 void NKA::makeAntiDKAFromFullDKA() {
@@ -365,9 +378,35 @@ void NKA::makeAntiDKAFromFullDKA() {
 }
 
 
+void NKA::writeAlphabet_(std::ofstream& file) {
+    file << "    $\\Sigma = \\left\\{";
+    size_t i = 0;
+    for (auto& symbol: alphabet_) {
+        file << symbol;
+        if (i != alphabet_.size() - 1) {
+            file << ", ";
+        }
+        ++i;
+    }
+    file << "\\right\\}$\\\\\n";
+}
+void NKA::writeAcceptingConfigurations_(std::ofstream& file,
+                                       const std::unordered_map<long long int, size_t>& numsConfigurations) {
+    file << "    $F = \\left\\{";
+    size_t i = 0;
+    for (auto& configuration: acceptingConfigurations_) {
+        file << numsConfigurations.at(configuration);
+        if (i != acceptingConfigurations_.size() - 1) {
+            file << ", ";
+        }
+        ++i;
+    }
+    file << "\\right\\}$\n\n";
+}
+
 void NKA::writeConfigurations_(std::ofstream& file,
-                               std::unordered_map<long long, size_t>& numsConfigurations,
-                               int r) {
+                               const std::unordered_map<long long, size_t>& numsConfigurations,
+                               double r) {
     for (auto& conf: configurations_) {
         file << "    \\node [state";
         if (conf == q0_) {
@@ -377,24 +416,24 @@ void NKA::writeConfigurations_(std::ofstream& file,
             file << ", accepting";
         }
 
-        double angle = 2 * M_PI / configurations_.size() * numsConfigurations[conf] + M_PI;
-        file << "] (" << numsConfigurations[conf] << ") at ("
+        double angle = 2 * M_PI / configurations_.size() * numsConfigurations.at(conf) + M_PI;
+        file << "] (" << numsConfigurations.at(conf) << ") at ("
                 << r * std::cos(angle) << ", "
                 << r * std::sin(angle) << ") {"
-                << numsConfigurations[conf] << "};\n";
+                << numsConfigurations.at(conf) << "};\n";
     }
 }
 void NKA::writeEdge_(std::ofstream& file, std::string word,
                      long long int startConf, long long int finishConf,
-                     std::unordered_map<long long, std::set<long long>>& daddies,
-                     std::unordered_map<long long int, size_t>& numsConfigurations) {
+                     const std::unordered_map<long long, std::set<long long>>& daddies,
+                     const std::unordered_map<long long int, size_t>& numsConfigurations) {
     file << "\n            edge ";
 
     if (finishConf == startConf) {
         file << "[loop ";
 
         int sz = numsConfigurations.size();
-        int num = numsConfigurations[finishConf];
+        int num = numsConfigurations.at(finishConf);
         if (num > sz / 8 && num <= sz * 3 / 8) {
             file << "below] ";
         } else if ((num > sz * 3 / 8 && num <= sz * 5 / 8) || num == 0) {
@@ -405,7 +444,7 @@ void NKA::writeEdge_(std::ofstream& file, std::string word,
             file << "left] ";
         }
     } else {
-        if (daddies[startConf].contains(finishConf)) {
+        if (daddies.at(startConf).contains(finishConf)) {
             file << "[bend left = 20] ";
         }
     }
@@ -414,19 +453,19 @@ void NKA::writeEdge_(std::ofstream& file, std::string word,
     if (word == EPS) {
         file << "\\varepsilon";
     }
-    file << "$} (" << numsConfigurations[finishConf] << ")";
+    file << "$} (" << numsConfigurations.at(finishConf) << ")";
 }
 std::unordered_map<long long, std::set<long long>> NKA::findDaddies() {
     std::unordered_map<long long, std::set<long long>> result;
 
+    for (auto& conf: configurations_) {
+        result.emplace(conf, std::set<long long>());
+    }
+
     for (auto& conf: transitions_) {
         for (auto& pair: conf.second) {
             for (auto& finish: pair.second) {
-                if (result.contains(finish)) {
-                    result[finish].insert(conf.first);
-                } else {
-                    result.emplace(finish, std::set<long long>{conf.first});
-                }
+                result[finish].insert(conf.first);
             }
         }
     }
@@ -450,16 +489,22 @@ void NKA::writeTransitions_(std::ofstream& file,
     file << ";\n";
 }
 void NKA::createTexFileThisNKA(const std::string& filename, double r, bool writeRegular) {
-    NKA copy(*this);
-    alphabet_.insert('+');
-    makeOneEdgeForAllPairs_();
-
     std::ofstream newFile(filename);
     std::ifstream prefix("PrefixTexFile.txt");
     newFile << prefix.rdbuf();
     prefix.close();
 
     auto numsConfigurations = getMapConfigurationToNumber_();
+    writeAlphabet_(newFile);
+    newFile << "    $q_0 = " << numsConfigurations.at(q0_) << "$\\\\\n";
+    writeAcceptingConfigurations_(newFile, numsConfigurations);
+
+    NKA copy(*this);
+    alphabet_.insert('+');
+    makeOneEdgeForAllPairs_();
+
+    newFile << "\\begin{tikzpicture}"
+               "[->, >=stealth', on grid, auto, node distance = 2.5cm, every state/.style={thick, fill=gray!20}]";
     writeConfigurations_(newFile, numsConfigurations, r);
     writeTransitions_(newFile, numsConfigurations);
 
@@ -592,6 +637,57 @@ void NKA::skipConfiguration_(long long int conf) {
     transitions_.erase(conf);
 }
 
+std::string NKA::getRegularIfOneConfiguration_(long long int conf) {
+    for (auto& pair: transitions_[conf]) {
+        if (pair.second.contains(conf)) {
+            return getStarsExpression_(pair.first);
+        }
+    }
+    return "";
+}
+std::string NKA::getRegularIfTwoConfiguration_(long long int start, long long int accept) {
+    std::string st_st, st_ac, ac_st, ac_ac;
+    bool hasAc_st = false;
+    bool hasSt_ac = false;
+
+    for (auto& pair: transitions_[start]) {
+        if (pair.second.contains(start)) {
+            st_st = getStarsExpression_(pair.first);
+        }
+        if (pair.second.contains(accept)) {
+            st_ac = getBracketedExpression_(pair.first);
+            hasSt_ac = true;
+        }
+    }
+
+    for (auto& pair: transitions_[accept]) {
+        if (pair.second.contains(start)) {
+            ac_st = getBracketedExpression_(pair.first);
+            hasAc_st = true;
+        }
+        if (pair.second.contains(accept)) {
+            if (!pair.first.empty()) {
+                ac_ac = pair.first + "+";
+            }
+        }
+    }
+
+    if (!hasSt_ac) {
+        return "\\emptyset";
+    }
+    if (!hasAc_st) {
+        return st_st + st_ac + getStarsExpression_(ac_ac);
+    }
+    return st_st + st_ac + getStarsExpression_(ac_ac + ac_st + st_st + st_ac);
+}
+void NKA::addRegularSymbols() {
+    alphabet_.insert('+');
+    alphabet_.insert('*');
+    alphabet_.insert('(');
+    alphabet_.insert(')');
+    alphabet_.insert('1');
+    alphabet_.insert('^');
+}
 std::string NKA::makeRegular() {
     NKA copy = *this;
 
@@ -605,41 +701,21 @@ std::string NKA::makeRegular() {
         if (conf != q0_ && !acceptingConfigurations_.contains(conf) && transitions_.contains(conf)) {
             makeOneEdgeForAllPairs_();
             skipConfiguration_(conf);
-            //createTexFileThisNKA("debug.tex", 5, false);
         }
     }
 
     makeOneEdgeForAllPairs_();
+
+    std::string result;
+
     if (acceptingConfigurations_.contains(q0_)) {
-        for (auto& pair: transitions_[q0_]) {
-            if (pair.second.contains(q0_)) {
-                return getStarsExpression_(pair.first);
-            }
-        }
-    }
+        result = getRegularIfOneConfiguration_(q0_);
+    } else {
+        long long ac = *acceptingConfigurations_.begin();
 
-    std::string q0_q0, q0_ac, ac_q0, ac_ac;
-    long long ac = *acceptingConfigurations_.begin();
-    for (auto& pair: transitions_[q0_]) {
-        if (pair.second.contains(q0_)) {
-            q0_q0 = getStarsExpression_(pair.first);
-        }
-        if (pair.second.contains(ac)) {
-            q0_ac = getBracketedExpression_(pair.first);
-        }
-    }
-
-    for (auto& pair: transitions_[ac]) {
-        if (pair.second.contains(q0_)) {
-            ac_q0 = getBracketedExpression_(pair.first);
-        }
-        if (pair.second.contains(ac)) {
-            if (!pair.first.empty()) {
-                ac_ac = pair.first + "+";
-            }
-        }
+        result = getRegularIfTwoConfiguration_(q0_, ac);
     }
 
     *this = std::move(copy);
-    return q0_q0 + q0_ac + getStarsExpression_(ac_ac + ac_q0 + q0_q0 + q0_ac);
+    return result;
 }

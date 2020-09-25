@@ -5,12 +5,14 @@ void testReplaceMultiSymbolsEdges();
 void testChangeEpsTransitions();
 void testMakeExplicitWays();
 void testFullDKA();
+void task1();
+void task2();
 
 int main() {
     //testReplaceMultiSymbolsEdges();
     //testMakeExplicitWays();
     //testChangeEpsTransitions();
-    testFullDKA();
+    task2();
 
     return 0;
 }
@@ -62,7 +64,7 @@ void testMakeExplicitWays() {
 }
 
 void testFullDKA() {
-    NKA nka(0, {'a', 'b', 'c'}, {0, 1, 2}, {0});
+    NKA nka(0, {'a', 'b', 'c'}, 3, {0});
 
     nka.addTransition(0, "c", 0);
     nka.addTransition(0, EPS, 1);
@@ -80,4 +82,43 @@ void testFullDKA() {
     nka.createTexFileThisNKA("tests/TestFullDKA_FullDKA.tex", 5);
     nka.makeAntiDKAFromFullDKA();
     nka.createTexFileThisNKA("tests/TestFullDKA_AntiDKA.tex", 5);
+}
+
+void task1() {
+    NKA nka(0, {'a', 'b'}, 2, {0, 1});
+
+    nka.addTransition(0, "ab", 0);
+    nka.addTransition(0, "ba", 0);
+    nka.addTransition(0, "a", 1);
+    nka.addTransition(0, "b", 1);
+
+    nka.createTexFileThisNKA("HW3/task1NKA.tex", 5);
+    nka.makeDKA();
+    nka.createTexFileThisNKA("HW3/task1DKA.tex", 5);
+    nka.makeFullDKAFromDKA();
+    nka.createTexFileThisNKA("HW3/task1FullDKA.tex", 5);
+    nka.makeAntiDKAFromFullDKA();
+    nka.createTexFileThisNKA("HW3/task1AntiDKA.tex", 5);
+}
+
+void task2() {
+    NKA nka(0, {'a', 'b'}, 5, {1, 2, 4});
+
+    nka.addTransition(0, EPS, 1);
+    nka.addTransition(0, EPS, 2);
+    nka.addTransition(1, "ab", 1);
+    nka.addTransition(1, "a", 4);
+    nka.addTransition(4, "a", 4);
+    nka.addTransition(2, "a", 3);
+    nka.addTransition(2, "b", 3);
+    nka.addTransition(3, "a", 2);
+    nka.addTransition(3, "b", 2);
+
+    nka.createTexFileThisNKA("HW3/task2NKA.tex", 5);
+    nka.makeDKA();
+    nka.createTexFileThisNKA("HW3/task2DKA.tex", 5);
+    nka.makeFullDKAFromDKA();
+    nka.createTexFileThisNKA("HW3/task2FullDKA.tex", 5);
+    nka.makeAntiDKAFromFullDKA();
+    nka.createTexFileThisNKA("HW3/task2AntiDKA.tex", 5);
 }

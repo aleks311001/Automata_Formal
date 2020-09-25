@@ -17,8 +17,11 @@
 #include <fstream>
 #include <cmath>
 
-const std::string EPS = "";
+const std::string EPS = ""; ///< Epsilon word
 
+/**
+ *
+ */
 class NKA {
 private:
     using TransitionsType = std::unordered_map<long long, std::unordered_map<std::string, std::set<long long>>>;
@@ -74,14 +77,51 @@ private:
      */
     bool checkSetConfigsOnAccepting_(const std::set<long long>& configurations);
 
+    /**
+     * Write alphabet in file
+     * @param [in, out] file file stream to write
+     */
+    void writeAlphabet_(std::ofstream& file);
+    /**
+     * Write accepting configurations in file
+     * @param [in, out] file file stream to write
+     * @param [in] numsConfigurations map with configuration -> its number
+     */
+    void writeAcceptingConfigurations_(std::ofstream& file,
+                                      const std::unordered_map<long long, size_t>& numsConfigurations);
+
+    /**
+     * Draw circle of configurations in file
+     * @param [in, out] file file stream to draw
+     * @param [in] numsConfigurations map with configuration -> its number
+     * @param [in] r circle radius
+     */
     void writeConfigurations_(std::ofstream& file,
-                              std::unordered_map<long long, size_t>& numsConfigurations,
-                              int r);
+                              const std::unordered_map<long long, size_t>& numsConfigurations,
+                              double r);
+    /**
+     * Draw edge in file
+     * @param [in, out] file file stream to draw
+     * @param [in] word symbols on edge
+     * @param [in] startConf start configuration of edge
+     * @param [in] finishConf finish configuration of edge
+     * @param [in] daddies map configuration -> all configurations which are daddy our configuration
+     * @param [in] numsConfigurations map with configuration -> its number
+     */
     void writeEdge_(std::ofstream& file, std::string word,
                     long long startConf, long long finishConf,
-                    std::unordered_map<long long, std::set<long long>>& daddies,
-                    std::unordered_map<long long, size_t>& numsConfigurations);
+                    const std::unordered_map<long long, std::set<long long>>& daddies,
+                    const std::unordered_map<long long, size_t>& numsConfigurations);
+    /**
+     * Make map that contain for each configuration set of its daddies
+     * @return made map
+     */
     std::unordered_map<long long, std::set<long long>> findDaddies();
+    /**
+     * Draw all edges in file
+     * @param [in, out] file file stream to draw
+     * @param [in] numsConfigurations
+     */
     void writeTransitions_(std::ofstream& file,
                            std::unordered_map<long long, size_t>& numsConfigurations);
 
@@ -89,7 +129,10 @@ private:
     void makeOneAcceptingConfiguration_();
     /// Replace EPS to "1"
     void replaceEpsilonToOne_();
-    /// For all edges w1,..., w_k from q1 to q2 make one edge w1+w2+...+w_k from q1 to q2 and delete old edges
+    /**
+     * For all edges \f$ w_1,\ldots, w_k \f$ from \f$ q_1 \f$ to \f$ q_2 \f$
+     * make one edge \f$ w_1+w_2+\ldots+w_k \f$ from \f$ q_1 \f$ to \f$ q_2 \f$ and delete old edges
+     */
     void makeOneEdgeForAllPairs_();
     /**
      * Add brackets to string, if len of string > 1
@@ -115,28 +158,59 @@ private:
      */
     void skipConfiguration_(long long conf);
 
+    /**
+     * Do last step of making regular, if left one configuration
+     * @param [in] conf left configuration
+     * @return final regular
+     */
+    std::string getRegularIfOneConfiguration_(long long conf);
+    /**
+     * Do last step of making regular, if left two configuration: start and accepting
+     * @param [in] start start configuration
+     * @param [in] accept accepting configuration
+     * @return final regular
+     */
+    std::string getRegularIfTwoConfiguration_(long long start, long long accept);
+
 public:
     NKA(long long q0 = 0,
         const std::set<char>& alphabet = std::set<char>(),
         const std::set<long long>& configurations = std::set<long long>(),
-        const std::set<long long>& acceptingConfigurations_ = std::set<long long>(),
+        const std::set<long long>& acceptingConfigurations = std::set<long long>(),
         const TransitionsType& transitions = TransitionsType());
+    NKA(long long q0,
+        const std::set<char>& alphabet,
+        long long numConfigurations,
+        const std::set<long long>& acceptingConfigurations = std::set<long long>(),
+        const TransitionsType& transitions = TransitionsType());
+
     NKA(const NKA& other);
     NKA(NKA&& other);
     NKA& operator= (const NKA& other);
     NKA& operator= (NKA&& other);
 
-    void changeQ0(long long q0);
-
+    /**
+     * Add configuration "add"
+     * @param [in] add added configuration
+     */
     void addConfiguration(long long add);
+    /**
+     * Add a symbol in alphabet
+     * @param [in] add added symbol
+     */
     void addSymbol(char add);
+    /**
+     * Add edge from left to right with value word
+     * @param [in] left start of edge configuration
+     * @param [in] word value on edge
+     * @param [in] right finish of edge configuration
+     */
     void addTransition(long long left, const std::string& word, long long right);
+    /**
+     * Make configuration "add" accepting
+     * @param add made configuration
+     */
     void addAcceptingConfiguration(long long add);
-
-    /*void delConfiguration(long long del);
-    void delSymbol(char del);
-    void delTransition(long long left, const std::string& word, long long right);
-    void delAcceptingConfiguration(long long del);*/
 
     /**
      * Generate and add unique configuration
@@ -155,25 +229,43 @@ public:
     void delEmptyConfigurations();
 
     /**
-     * transform this in NKA with a single edge type from each state
+     * Transform this in NKA with a single edge type from each state
      */
     void makeExplicitWays();
+
+    /**
+     * Make DKA. Call:
+     * @code
+     * replaceMultiSymbolsEdges();
+     * changeEpsTransitions();
+     * makeExplicitWays();
+     * @endcode
+     */
     void makeDKA();
 
+    /// Make full DKA from DKA
     void makeFullDKAFromDKA();
+    ///Make anti DKA from full DKA
     void makeAntiDKAFromFullDKA();
 
+    /**
+     * @brief Create file with this NKA.
+     * @details Write alphabet, q0, accepting configurations and draw NKA
+     * @param filename name of created file
+     * @param r radius of configurations circle
+     * @param writeRegular if true make and write in file regular expression
+     */
     void createTexFileThisNKA(const std::string& filename, double r, bool writeRegular = true);
 
-    void addRegularSymbols() {
-        alphabet_.insert('+');
-        alphabet_.insert('*');
-        alphabet_.insert('(');
-        alphabet_.insert(')');
-        alphabet_.insert('1');
-        alphabet_.insert('^');
-    }
+    /**
+     * add regular symbols {+, ^, *, (, ), 1} in alphabet
+     */
+    void addRegularSymbols();
 
+    /**
+     * Make regular this NKA
+     * @return regular
+     */
     std::string makeRegular();
 };
 

@@ -17,5 +17,3 @@
 \begin{document}
 \pagestyle{empty}
 \noindent
-
-\begin{tikzpicture}[->, >=stealth', on grid, auto, node distance = 2.5cm, every state/.style={thick, fill=gray!20}]
