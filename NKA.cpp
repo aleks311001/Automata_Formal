@@ -488,7 +488,7 @@ void NKA::writeTransitions_(std::ofstream& file,
     }
     file << ";\n";
 }
-void NKA::createTexFileThisNKA(const std::string& filename, double r, bool writeRegular) {
+void NKA::createTexFileThisNKAWithoutCopy(const std::string& filename, double r, bool writeRegular) {
     std::ofstream newFile(filename);
     std::ifstream prefix("PrefixTexFile.txt");
     newFile << prefix.rdbuf();
@@ -499,9 +499,8 @@ void NKA::createTexFileThisNKA(const std::string& filename, double r, bool write
     newFile << "    $q_0 = " << numsConfigurations.at(q0_) << "$\\\\\n";
     writeAcceptingConfigurations_(newFile, numsConfigurations);
 
-    NKA copy(*this);
     alphabet_.insert('+');
-    makeOneEdgeForAllPairs_();
+    makeOneEdgeForAllPairs_('+');
 
     newFile << "\\begin{tikzpicture}"
                "[->, >=stealth', on grid, auto, node distance = 2.5cm, every state/.style={thick, fill=gray!20}]";
@@ -513,8 +512,10 @@ void NKA::createTexFileThisNKA(const std::string& filename, double r, bool write
         newFile << "$" + makeRegular() + "$\n";
     }
     newFile << "\\end{document}\n";
-
-    *this = std::move(copy);
+}
+void NKA::createTexFileThisNKA(const std::string& filename, double r, bool writeRegular) {
+    NKA copy = *this;
+    copy.createTexFileThisNKAWithoutCopy(filename, r, writeRegular);
 }
 
 
@@ -538,7 +539,7 @@ void NKA::replaceEpsilonToOne_() {
         }
     }
 }
-void NKA::makeOneEdgeForAllPairs_() {
+void NKA::makeOneEdgeForAllPairs_(char symbolBetweenWords) {
     for (auto& conf: configurations_) {
         if (transitions_.contains(conf)) {
             std::unordered_map<long long, std::string> configurationToEdge;
@@ -546,7 +547,7 @@ void NKA::makeOneEdgeForAllPairs_() {
             for (auto& pair: transitions_[conf]) {
                 for (auto& finalConf: pair.second) {
                     if (configurationToEdge.contains(finalConf)) {
-                        configurationToEdge[finalConf] += "+" + pair.first;
+                        configurationToEdge[finalConf] += symbolBetweenWords + pair.first;
                     } else {
                         configurationToEdge.emplace(finalConf, pair.first);
                     }
@@ -688,7 +689,7 @@ void NKA::addRegularSymbols() {
     alphabet_.insert('1');
     alphabet_.insert('^');
 }
-std::string NKA::makeRegular() {
+std::string NKA::makeRegularWithoutCopy() {
     NKA copy = *this;
 
     addRegularSymbols();
@@ -698,11 +699,13 @@ std::string NKA::makeRegular() {
     replaceEpsilonToOne_();
 
     for (auto& conf: configurations_) {
+        //createTexFileThisNKA("tests/stepMakeRegularFor" + std::to_string(conf) + ".tex", 5, false);
         if (conf != q0_ && !acceptingConfigurations_.contains(conf) && transitions_.contains(conf)) {
             makeOneEdgeForAllPairs_();
             skipConfiguration_(conf);
         }
     }
+    //createTexFileThisNKA("tests/stepMakeRegularForLast.tex", 5, false);
 
     makeOneEdgeForAllPairs_();
 
@@ -716,6 +719,103 @@ std::string NKA::makeRegular() {
         result = getRegularIfTwoConfiguration_(q0_, ac);
     }
 
-    *this = std::move(copy);
     return result;
+}
+std::string NKA::makeRegular() {
+    NKA copy = *this;
+    return copy.makeRegularWithoutCopy();
+}
+
+bool equalMaps_(const std::unordered_map<long long, long long>& left,
+                const std::unordered_map<long long, long long>& right) {
+    if (left.size() != right.size()) {
+        return false;
+    }
+
+    for (auto& pair: left) {
+        if (!right.contains(pair.first)) {
+            return false;
+        }
+
+        if (right.at(pair.first) != pair.second) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool equalVectors_(const std::vector<long long>& left,
+                   const std::vector<long long>& right) {
+    if (left.size() != right.size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < left.size(); ++i) {
+        if (left[i] != right[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void NKA::makeMinFullDKA() {
+    std::unordered_map<long long, long long> oldNumConf;
+    std::unordered_map<long long, long long> newNumConf;
+
+    for (auto& conf: configurations_) {
+        newNumConf.emplace(conf, acceptingConfigurations_.contains(conf));
+    }
+
+    while (!equalMaps_(newNumConf, oldNumConf)) {
+        oldNumConf = std::move(newNumConf);
+        newNumConf.clear();
+
+        std::unordered_map<long long, std::vector<long long>> transitions;
+        for (auto& conf: configurations_) {
+            transitions.emplace(conf, std::vector{oldNumConf[conf]});
+        }
+
+        for (auto& symbol: alphabet_) {
+            for (auto& conf: configurations_) {
+                long long insertedNum = oldNumConf[*transitions_[conf][std::string(&symbol, 1)].begin()];
+                transitions[conf].push_back(insertedNum);
+            }
+        }
+
+        for (auto& conf: configurations_) {
+            for (auto& conf2: configurations_) {
+                if (conf != conf2 && newNumConf.contains(conf2) && equalVectors_(transitions[conf], transitions[conf2])) {
+                    newNumConf.emplace(conf, newNumConf[conf2]);
+                    break;
+                }
+            }
+
+            if (!newNumConf.contains(conf)) {
+                newNumConf.emplace(conf, conf);
+            }
+        }
+    }
+
+    std::set<long long> newConfigurations;
+    for (auto& conf: configurations_) {
+        newConfigurations.insert(newNumConf[conf]);
+    }
+
+    std::set<long long> newAcceptingConfigurations;
+    for (auto& accept: acceptingConfigurations_) {
+        newAcceptingConfigurations.insert(newNumConf[accept]);
+    }
+
+    NKA newNKA(newNumConf[q0_], alphabet_, newConfigurations, newAcceptingConfigurations);
+    for (auto& pair: transitions_) {
+        for (auto& transition: pair.second) {
+            for (auto& final: transition.second) {
+                newNKA.addTransition(newNumConf[pair.first], transition.first, newNumConf[final]);
+            }
+        }
+    }
+
+    *this = std::move(newNKA);
 }

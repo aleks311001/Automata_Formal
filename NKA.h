@@ -22,7 +22,6 @@ const std::string EPS = ""; ///< Epsilon word
 /**
  * @brief NKA class
  * @details This class can make DKA, full DKA, anti DKA, regular expression and draw in file automata.
- * @public
  */
 class NKA {
 private:
@@ -134,8 +133,9 @@ private:
     /**
      * For all edges \f$ w_1,\ldots, w_k \f$ from \f$ q_1 \f$ to \f$ q_2 \f$
      * make one edge \f$ w_1+w_2+\ldots+w_k \f$ from \f$ q_1 \f$ to \f$ q_2 \f$ and delete old edges
+     * @param symbol that stand between two words, as '+' or ','
      */
-    void makeOneEdgeForAllPairs_();
+    void makeOneEdgeForAllPairs_(char symbolBetweenWords = '+');
     /**
      * Add brackets to string, if len of string > 1
      * @param [in] string
@@ -259,6 +259,8 @@ public:
     void makeFullDKAFromDKA();
     ///Make anti DKA from full DKA
     void makeAntiDKAFromFullDKA();
+    ///Make minimal full DKA
+    void makeMinFullDKA();
 
     /**
      * @brief Create file with this NKA.
@@ -268,6 +270,16 @@ public:
      * @param [in] writeRegular if true make and write in file regular expression
      */
     void createTexFileThisNKA(const std::string& filename, double r, bool writeRegular = true);
+    /**
+     * @brief Create file with this NKA without copy NKA, but break this NKA.
+     * @details Write alphabet, q0, accepting configurations and draw NKA
+     * @param [in] filename name of created file
+     * @param [in] r radius of configurations circle
+     * @param [in] writeRegular if true make and write in file regular expression
+     */
+    void createTexFileThisNKAWithoutCopy(const std::string& filename, double r, bool writeRegular = true);
+
+
 
     /**
      * add regular symbols {+, ^, *, (, ), 1} in alphabet
@@ -279,6 +291,11 @@ public:
      * @return regular
      */
     std::string makeRegular();
+    /**
+     * Make regular this NKA without copy, but broke it
+     * @return regular
+     */
+    std::string makeRegularWithoutCopy();
 };
 
 
