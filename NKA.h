@@ -19,6 +19,7 @@
 
 const std::string EPS = ""; ///< Epsilon word
 
+
 /**
  * @brief NKA class
  * @details This class can make DKA, full DKA, anti DKA, regular expression and draw in file automata.
@@ -33,6 +34,8 @@ private:
     long long q0_;
     std::set<long long> acceptingConfigurations_;
 
+
+    void addTransitionWithoutCheck_(long long left, const std::string& word, long long right);
     /**
      * @details Find all ends configurations of ways from start, that has epsilon transitions,
      * but last transition is not epsilon. start-EPS->q_1-EPS->q_2-EPS->....-EPS->q_n-a->q in endWayConfigurations
@@ -110,8 +113,8 @@ private:
      * @param [in] numsConfigurations map with configuration -> its number
      */
     void writeEdge_(std::ofstream& file, std::string word,
-                    long long startConf, long long finishConf,
-                    const std::unordered_map<long long, std::set<long long>>& daddies,
+                    long long startConf, long long finishConf, int angle,
+                    /*const std::unordered_map<long long, std::set<long long>>& daddies,*/
                     const std::unordered_map<long long, size_t>& numsConfigurations);
     /**
      * Make map that contain for each configuration set of its daddies
@@ -257,9 +260,15 @@ public:
 
     /// Make full DKA from DKA
     void makeFullDKAFromDKA();
+    /// Make full DKA from NKA
+    void makeFullDKA();
     ///Make anti DKA from full DKA
     void makeAntiDKAFromFullDKA();
-    ///Make minimal full DKA
+    ///Make anti DKA from NKA
+    void makeAntiDKA();
+    ///Make minimal full DKA from full DKA
+    void makeMinFullDKAFromFullDKA();
+    ///Make minimal full DKA from NKA
     void makeMinFullDKA();
 
     /**
@@ -296,7 +305,8 @@ public:
      * @return regular
      */
     std::string makeRegularWithoutCopy();
-};
 
+    bool operator==(const NKA& other);
+};
 
 #endif //FORMAL__NKA_H_

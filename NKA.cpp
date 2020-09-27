@@ -4,6 +4,42 @@
 
 #include "NKA.h"
 
+
+bool equalMaps(const std::unordered_map<long long, long long>& left,
+               const std::unordered_map<long long, long long>& right) {
+    if (left.size() != right.size()) {
+        return false;
+    }
+
+    for (auto& pair: left) {
+        if (!right.contains(pair.first)) {
+            return false;
+        }
+
+        if (right.at(pair.first) != pair.second) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool equalVectors(const std::vector<long long>& left,
+                  const std::vector<long long>& right) {
+    if (left.size() != right.size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < left.size(); ++i) {
+        if (left[i] != right[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 NKA::NKA(long long q0,
          const std::set<char>& alphabet,
          const std::set<long long>& configurations,
@@ -70,6 +106,17 @@ void NKA::addSymbol(char add) {
     }
     alphabet_.insert(add);
 }
+void NKA::addTransitionWithoutCheck_(long long int left, const std::string& word, long long int right) {
+    if (!transitions_.contains(left)) {
+        transitions_.emplace(left, std::unordered_map<std::string, std::set<long long>>());
+    }
+    if (!transitions_[left].contains(word)) {
+        transitions_[left].emplace(word, std::set<long long>());
+    }
+    if (!transitions_[left][word].contains(right)) {
+        transitions_[left][word].insert(right);
+    }
+}
 void NKA::addTransition(long long left, const std::string& word, long long right) {
     if (!configurations_.contains(left) ||
         !configurations_.contains(right)) {
@@ -82,15 +129,7 @@ void NKA::addTransition(long long left, const std::string& word, long long right
         }
     }
 
-    if (!transitions_.contains(left)) {
-        transitions_.emplace(left, std::unordered_map<std::string, std::set<long long>>());
-    }
-    if (!transitions_[left].contains(word)) {
-        transitions_[left].emplace(word, std::set<long long>());
-    }
-    if (!transitions_[left][word].contains(right)) {
-        transitions_[left][word].insert(right);
-    }
+    addTransitionWithoutCheck_(left, word, right);
 }
 void NKA::addAcceptingConfiguration(long long add) {
     if (acceptingConfigurations_.contains(add)) {
@@ -268,10 +307,10 @@ std::unordered_map<long long, size_t> NKA::getMapConfigurationToNumber_() {
 }
 long long NKA::makeConfigurationFromOthers_(const std::set<long long int>& configurations,
                                             const std::unordered_map<long long int, size_t>& indexesConfigs) {
-    long long result = 0;
+    unsigned long long result = 0;
 
     for (auto& conf: configurations) {
-        result |= (1ll<<indexesConfigs.at(conf));
+        result |= (1ull<<indexesConfigs.at(conf));
     }
 
     return result;
@@ -364,6 +403,10 @@ void NKA::makeFullDKAFromDKA() {
         addTransition(newConf, std::string(&symbol, 1), newConf);
     }
 }
+void NKA::makeFullDKA() {
+    makeDKA();
+    makeFullDKAFromDKA();
+}
 
 void NKA::makeAntiDKAFromFullDKA() {
     std::set<long long> antiAccepting;
@@ -375,6 +418,11 @@ void NKA::makeAntiDKAFromFullDKA() {
     }
 
     acceptingConfigurations_ = std::move(antiAccepting);
+}
+
+void NKA::makeAntiDKA() {
+    makeFullDKA();
+    makeAntiDKAFromFullDKA();
 }
 
 
@@ -424,8 +472,8 @@ void NKA::writeConfigurations_(std::ofstream& file,
     }
 }
 void NKA::writeEdge_(std::ofstream& file, std::string word,
-                     long long int startConf, long long int finishConf,
-                     const std::unordered_map<long long, std::set<long long>>& daddies,
+                     long long int startConf, long long int finishConf, int angle,
+                     /*const std::unordered_map<long long, std::set<long long>>& daddies,*/
                      const std::unordered_map<long long int, size_t>& numsConfigurations) {
     file << "\n            edge ";
 
@@ -444,9 +492,9 @@ void NKA::writeEdge_(std::ofstream& file, std::string word,
             file << "left] ";
         }
     } else {
-        if (daddies.at(startConf).contains(finishConf)) {
-            file << "[bend left = 20] ";
-        }
+        //if (daddies.at(startConf).contains(finishConf) || angle > 0) {
+            file << "[bend left = " << angle << "] ";
+        //}
     }
 
     file << "node {$" << word;
@@ -474,15 +522,20 @@ std::unordered_map<long long, std::set<long long>> NKA::findDaddies() {
 }
 void NKA::writeTransitions_(std::ofstream& file,
                             std::unordered_map<long long, size_t>& numsConfigurations) {
-    auto daddies = findDaddies();
+    //auto daddies = findDaddies();
+    std::unordered_map<long long, std::unordered_map<long long, int>> numEdges;
+
     file << "\n    \\path";
+
     for (auto& transition: transitions_) {
         file << "\n        ("
              << numsConfigurations[transition.first] << ") ";
 
         for (auto& pair: transition.second) {
             for (auto& conf: pair.second) {
-                writeEdge_(file, pair.first, transition.first, conf, daddies, numsConfigurations);
+                ++numEdges[transition.first][conf];
+                writeEdge_(file, pair.first, transition.first, conf, numEdges[transition.first][conf] * 10,
+                           /*daddies, */numsConfigurations);
             }
         }
     }
@@ -499,8 +552,7 @@ void NKA::createTexFileThisNKAWithoutCopy(const std::string& filename, double r,
     newFile << "    $q_0 = " << numsConfigurations.at(q0_) << "$\\\\\n";
     writeAcceptingConfigurations_(newFile, numsConfigurations);
 
-    alphabet_.insert('+');
-    makeOneEdgeForAllPairs_('+');
+    //makeOneEdgeForAllPairs_('+');
 
     newFile << "\\begin{tikzpicture}"
                "[->, >=stealth', on grid, auto, node distance = 2.5cm, every state/.style={thick, fill=gray!20}]";
@@ -547,8 +599,14 @@ void NKA::makeOneEdgeForAllPairs_(char symbolBetweenWords) {
             for (auto& pair: transitions_[conf]) {
                 for (auto& finalConf: pair.second) {
                     if (configurationToEdge.contains(finalConf)) {
+                        if (pair.first == EPS) {
+                            (configurationToEdge[finalConf] += symbolBetweenWords) += "1";
+                        }
                         configurationToEdge[finalConf] += symbolBetweenWords + pair.first;
                     } else {
+                        if (pair.first == EPS) {
+                            configurationToEdge.emplace(finalConf, "1");
+                        }
                         configurationToEdge.emplace(finalConf, pair.first);
                     }
                 }
@@ -556,7 +614,7 @@ void NKA::makeOneEdgeForAllPairs_(char symbolBetweenWords) {
 
             transitions_[conf].clear();
             for (auto& pair: configurationToEdge) {
-                addTransition(conf, pair.second, pair.first);
+                addTransitionWithoutCheck_(conf, pair.second, pair.first);
             }
         }
     }
@@ -726,41 +784,7 @@ std::string NKA::makeRegular() {
     return copy.makeRegularWithoutCopy();
 }
 
-bool equalMaps_(const std::unordered_map<long long, long long>& left,
-                const std::unordered_map<long long, long long>& right) {
-    if (left.size() != right.size()) {
-        return false;
-    }
-
-    for (auto& pair: left) {
-        if (!right.contains(pair.first)) {
-            return false;
-        }
-
-        if (right.at(pair.first) != pair.second) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool equalVectors_(const std::vector<long long>& left,
-                   const std::vector<long long>& right) {
-    if (left.size() != right.size()) {
-        return false;
-    }
-
-    for (size_t i = 0; i < left.size(); ++i) {
-        if (left[i] != right[i]) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void NKA::makeMinFullDKA() {
+void NKA::makeMinFullDKAFromFullDKA() {
     std::unordered_map<long long, long long> oldNumConf;
     std::unordered_map<long long, long long> newNumConf;
 
@@ -768,7 +792,7 @@ void NKA::makeMinFullDKA() {
         newNumConf.emplace(conf, acceptingConfigurations_.contains(conf));
     }
 
-    while (!equalMaps_(newNumConf, oldNumConf)) {
+    while (!equalMaps(newNumConf, oldNumConf)) {
         oldNumConf = std::move(newNumConf);
         newNumConf.clear();
 
@@ -786,7 +810,7 @@ void NKA::makeMinFullDKA() {
 
         for (auto& conf: configurations_) {
             for (auto& conf2: configurations_) {
-                if (conf != conf2 && newNumConf.contains(conf2) && equalVectors_(transitions[conf], transitions[conf2])) {
+                if (conf != conf2 && newNumConf.contains(conf2) && equalVectors(transitions[conf], transitions[conf2])) {
                     newNumConf.emplace(conf, newNumConf[conf2]);
                     break;
                 }
@@ -818,4 +842,61 @@ void NKA::makeMinFullDKA() {
     }
 
     *this = std::move(newNKA);
+}
+void NKA::makeMinFullDKA() {
+    makeFullDKA();
+    makeMinFullDKAFromFullDKA();
+}
+
+
+bool NKA::operator==(const NKA& other) {
+    NKA left = *this;
+    NKA right = other;
+
+    left.makeMinFullDKA();
+    right.makeMinFullDKA();
+
+    if (left.alphabet_.size() != right.alphabet_.size()) {
+        return false;
+    }
+
+    if (left.configurations_.size() != right.configurations_.size()) {
+        return false;
+    }
+
+    for (auto& symbol: left.alphabet_) {
+        if (!right.alphabet_.contains(symbol)) {
+            return false;
+        }
+    }
+
+    std::unordered_map<long long, long long> leftToRightConfigurations;
+    leftToRightConfigurations.emplace(left.q0_, right.q0_);
+
+    std::queue<long long> queueConfigs;
+    queueConfigs.push(left.q0_);
+
+    while (!queueConfigs.empty()) {
+        long long conf = queueConfigs.front();
+        queueConfigs.pop();
+
+        for (auto& pair: left.transitions_[conf]) {
+            long long finishLeft = *pair.second.begin();
+            long long finishRight = *right.transitions_[leftToRightConfigurations[conf]][pair.first].begin();
+            if (leftToRightConfigurations.contains(finishLeft)) {
+                if (leftToRightConfigurations[finishLeft] != finishRight) {
+                    return false;
+                }
+            } else {
+                leftToRightConfigurations.emplace(finishLeft, finishRight);
+                queueConfigs.push(finishLeft);
+                if (left.acceptingConfigurations_.contains(finishLeft) ^
+                    right.acceptingConfigurations_.contains(finishRight)) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }
