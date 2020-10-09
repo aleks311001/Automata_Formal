@@ -1,0 +1,117 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=1.5cm,right=1.5cm,top=1.75cm,bottom=1.75cm]{geometry}
+
+\newcommand{\timelimit}{}
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+
+
+\begin{document}
+\pagestyle{empty}
+\noindent
+    $\Sigma = \left\{a, b\right\}$\\
+    $q_0 = 0$\\
+    $F = \left\{2, 3, 8, 9, 10, 11, 14, 15, 17, 20, 21\right\}$
+
+\begin{tikzpicture}[->, >=stealth', on grid, auto, node distance = 2.5cm, every state/.style={thick, fill=gray!20}]    \node [state, initial] (0) at (-8, 9.79717e-16) {0};
+    \node [state] (1) at (-7.67594, -2.25386) {1};
+    \node [state, accepting] (2) at (-6.73003, -4.32513) {2};
+    \node [state, accepting] (3) at (-5.23889, -6.046) {3};
+    \node [state] (4) at (-3.32332, -7.27706) {4};
+    \node [state] (5) at (-1.13852, -7.91857) {5};
+    \node [state] (6) at (1.13852, -7.91857) {6};
+    \node [state] (7) at (3.32332, -7.27706) {7};
+    \node [state, accepting] (8) at (5.23889, -6.046) {8};
+    \node [state, accepting] (9) at (6.73003, -4.32513) {9};
+    \node [state, accepting] (10) at (7.67594, -2.25386) {10};
+    \node [state, accepting] (11) at (8, -1.95943e-15) {11};
+    \node [state] (12) at (7.67594, 2.25386) {12};
+    \node [state] (13) at (6.73003, 4.32513) {13};
+    \node [state, accepting] (14) at (5.23889, 6.046) {14};
+    \node [state, accepting] (15) at (3.32332, 7.27706) {15};
+    \node [state] (16) at (1.13852, 7.91857) {16};
+    \node [state, accepting] (17) at (-1.13852, 7.91857) {17};
+    \node [state] (18) at (-3.32332, 7.27706) {18};
+    \node [state] (19) at (-5.23889, 6.046) {19};
+    \node [state, accepting] (20) at (-6.73003, 4.32513) {20};
+    \node [state, accepting] (21) at (-7.67594, 2.25386) {21};
+
+    \path
+        (10) 
+            edge node {$a$} (9)
+            edge [bend left = 20] node {$b$} (15)
+        (0) 
+            edge node {$a$} (4)
+            edge [loop right] node {$b$} (0)
+        (20) 
+            edge node {$a$} (7)
+            edge node {$b$} (17)
+        (8) 
+            edge node {$a$} (5)
+            edge node {$b$} (14)
+        (19) 
+            edge node {$a$} (11)
+            edge node {$b$} (16)
+        (9) 
+            edge node {$a$} (5)
+            edge node {$b$} (20)
+        (13) 
+            edge node {$a$} (10)
+            edge node {$b$} (1)
+        (16) 
+            edge node {$a$} (9)
+            edge [loop above] node {$b$} (16)
+        (6) 
+            edge node {$a$} (9)
+            edge node {$b$} (13)
+        (2) 
+            edge node {$a$} (4)
+            edge [loop left] node {$b$} (2)
+        (14) 
+            edge node {$a$} (6)
+            edge node {$b$} (2)
+        (11) 
+            edge node {$a$} (9)
+            edge [bend left = 20] node {$b$} (21)
+        (3) 
+            edge node {$a$} (8)
+            edge [loop below] node {$b$} (3)
+        (12) 
+            edge node {$a$} (6)
+            edge node {$b$} (0)
+        (7) 
+            edge node {$a$} (9)
+            edge node {$b$} (19)
+        (21) 
+            edge [bend left = 20] node {$a$} (11)
+            edge node {$b$} (17)
+        (5) 
+            edge [loop below] node {$a$} (5)
+            edge node {$b$} (18)
+        (15) 
+            edge [bend left = 20] node {$a$} (10)
+            edge node {$b$} (3)
+        (17) 
+            edge node {$a$} (9)
+            edge [loop above] node {$b$} (17)
+        (1) 
+            edge node {$a$} (8)
+            edge [loop left] node {$b$} (1)
+        (18) 
+            edge node {$a$} (7)
+            edge node {$b$} (16)
+        (4) 
+            edge node {$a$} (5)
+            edge node {$b$} (12);
+\end{tikzpicture}
+
+$(((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*(((bb^*a)b)b))+(ab)b+b+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*(((bb^*a)b)b))^*(((((((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+a(a(aa^*b))+(bb^*a)(aa^*b))+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+((ab)(ab))(a(a(aa^*b))+(bb^*a)(aa^*b))+(ab)((aa)(aa^*b))+(aa)a^*b)((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(bb^*(ab)+a(ab)+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))+((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(a(ab)+((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(ab))+((bb^*a)b)((aa)b)+(aa)b))+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(ab))+((bb^*a)b)((aa)b)+(aa)b)+((ab)(ab))(a(ab))+(ab)((aa)b)+(((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+a(a(aa^*b))+(bb^*a)(aa^*b))+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+((ab)(ab))(a(a(aa^*b))+(bb^*a)(aa^*b))+(ab)((aa)(aa^*b))+(aa)a^*b)((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))((((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab)+ab)((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(bb^*(ab)+a(ab)+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))+((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b)+bb^*(ab)+(aa)b)^*((((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab)+ab)((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(ab))+((((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+a(a(aa^*b))+(bb^*a)(aa^*b))+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+((ab)(ab))(a(a(aa^*b))+(bb^*a)(aa^*b))+(ab)((aa)(aa^*b))+(aa)a^*b)((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(ab))((((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(bb^*(ab)+a(ab)+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))+bb^*(ab)+a(ab)+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))((((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab)+ab)((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(bb^*(ab)+a(ab)+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))+((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b)+bb^*(ab)+(aa)b)^*((((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab)+ab)((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(ab))+((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(ab)+ab)^*((((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(bb^*(ab)+a(ab)+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))+bb^*(ab)+a(ab)+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))((((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab)+ab)((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(bb^*(ab)+a(ab)+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))+((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b)+bb^*(ab)+(aa)b)^*((((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab)+ab)((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*a+(aa))+bb^*a+a(a+1))+bb^*(a+1)+(aa)+1+((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*a+(aa)))+((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*a+(aa))+bb^*a+a(a+1))+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*a+(aa))+bb^*(a+1)+a(a+1)+1)+(((((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+a(a(aa^*b))+(bb^*a)(aa^*b))+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+((ab)(ab))(a(a(aa^*b))+(bb^*a)(aa^*b))+(ab)((aa)(aa^*b))+(aa)a^*b)((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(bb^*(ab)+a(ab)+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))+((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(a(ab)+((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(ab))+((bb^*a)b)((aa)b)+(aa)b))+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(ab))+((bb^*a)b)((aa)b)+(aa)b)+((ab)(ab))(a(ab))+(ab)((aa)b)+(((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+a(a(aa^*b))+(bb^*a)(aa^*b))+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+((ab)(ab))(a(a(aa^*b))+(bb^*a)(aa^*b))+(ab)((aa)(aa^*b))+(aa)a^*b)((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))((((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab)+ab)((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*(bb^*(ab)+a(ab)+(bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b))+((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*(ab)+(aa)b)+bb^*(ab)+(aa)b)^*((((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab)+ab)((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*a+(aa))+bb^*a+a(a+1))+bb^*(a+1)+(aa)+1+((aa)(aa^*b)+bb^*(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*a+(aa)))+(((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+a(a(aa^*b))+(bb^*a)(aa^*b))+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+((ab)(ab))(a(a(aa^*b))+(bb^*a)(aa^*b))+(ab)((aa)(aa^*b))+(aa)a^*b)((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*a+(aa))+((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a+1)+(bb^*a))+((bb^*a)b)((aa))+(aa)+bb^*+1)+a(a+1)+(bb^*a)+bb^*+1)+((ab)(ab))(a(a+1)+(bb^*a))+(ab)((aa))+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a+1)+(bb^*a))+((bb^*a)b)((aa))+(aa)+bb^*+1)+((((((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+((ab)(ab))(ab))(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(ab))+ab)^*(((bb^*a)b)((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+a(a(aa^*b))+(bb^*a)(aa^*b))+(((ab)(ab))((bb^*a)b))((((bb^*a)b)(ab)+ab)((bb^*a)b))^*((((bb^*a)b)(ab)+ab)(a(a(aa^*b))+(bb^*a)(aa^*b))+((bb^*a)b)((aa)(aa^*b))+(aa)(aa^*b)+((bb^*a)a)a^*b)+((ab)(ab))(a(a(aa^*b))+(bb^*a)(aa^*b))+(ab)((aa)(aa^*b))+(aa)a^*b)((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(ab))^*((bb^*(a(aa^*b))+a(a(aa^*b)))((aa)(aa^*b)+bb^*(a(aa^*b)))^*(bb^*a+(aa))+bb^*a+a(a+1)))$
+\end{document}

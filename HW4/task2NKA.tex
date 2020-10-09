@@ -1,0 +1,41 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=1.5cm,right=1.5cm,top=1.75cm,bottom=1.75cm]{geometry}
+
+\newcommand{\timelimit}{}
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+
+
+\begin{document}
+\pagestyle{empty}
+\noindent
+    $\Sigma = \left\{a, b\right\}$\\
+    $q_0 = 0$\\
+    $F = \left\{0\right\}$
+
+\begin{tikzpicture}[->, >=stealth', on grid, auto, node distance = 2.5cm, every state/.style={thick, fill=gray!20}]    \node [state, initial, accepting] (0) at (-5, 6.12323e-16) {0};
+    \node [state] (1) at (2.5, -4.33013) {1};
+    \node [state] (2) at (2.5, 4.33013) {2};
+
+    \path
+        (2) 
+            edge [bend left = 20] node {$a$} (1)
+            edge [loop above] node {$ba$} (2)
+        (1) 
+            edge [bend left = 20] node {$b$} (2)
+            edge [loop below] node {$ab$} (1)
+            edge [bend left = 20] node {$\varepsilon$} (0)
+        (0) 
+            edge [bend left = 20] node {$a$} (1);
+\end{tikzpicture}
+
+$((a(ab)^*b)(a(ab)^*b+ba)^*(a(ab)^*)+a(ab)^*)^*$
+\end{document}
