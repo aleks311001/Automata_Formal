@@ -61,6 +61,10 @@ private:
      */
     void removeEpsilonTransitions_();
 
+    /*bool hasWayToAccepting_(long long start,
+                            std::unordered_map<long long, bool>& newConfigurations,
+                            std::unordered_map<long long, bool>& wasIn);*/
+
     /**
      * For each configuration make a unique number in [0, number of Configurations)
      * @return map: configuration -> number
@@ -81,6 +85,11 @@ private:
      */
     bool checkSetConfigsOnAccepting_(const std::set<long long>& configurations);
 
+    /**
+     * Write prefix (includes, begins...) in file
+     * @param [in, out] file
+     */
+    void writePrefix_(std::ofstream& file);
     /**
      * Write alphabet in file
      * @param [in, out] file file stream to write
@@ -113,8 +122,8 @@ private:
      * @param [in] numsConfigurations map with configuration -> its number
      */
     void writeEdge_(std::ofstream& file, std::string word,
-                    long long startConf, long long finishConf, int angle,
-                    /*const std::unordered_map<long long, std::set<long long>>& daddies,*/
+                    long long startConf, long long finishConf,/* int angle,*/
+                    const std::unordered_map<long long, std::set<long long>>& daddies,
                     const std::unordered_map<long long, size_t>& numsConfigurations);
     /**
      * Make map that contain for each configuration set of its daddies
@@ -128,6 +137,8 @@ private:
      */
     void writeTransitions_(std::ofstream& file,
                            std::unordered_map<long long, size_t>& numsConfigurations);
+    void writeMainPart_(std::ofstream& file, double r);
+    void writeSuffix_(std::ofstream& file, bool writeRegular);
 
     /// Create new configurations and edges from old accepting configurations to this
     void makeOneAcceptingConfiguration_();
@@ -138,7 +149,7 @@ private:
      * make one edge \f$ w_1+w_2+\ldots+w_k \f$ from \f$ q_1 \f$ to \f$ q_2 \f$ and delete old edges
      * @param symbol that stand between two words, as '+' or ','
      */
-    void makeOneEdgeForAllPairs_(char symbolBetweenWords = '+');
+    void makeOneEdgeForAllPairs_(char symbolBetweenWords = '+', const std::string& replaceEPS = "1");
     /**
      * Add brackets to string, if len of string > 1
      * @param [in] string
@@ -226,6 +237,7 @@ public:
      * @throw invalid_argument if deleted configuration does not contains in accepting configuration
      */
     void delAcceptingConfiguration(long long del);
+    void delConfiguration(long long conf);
 
     /**
      * Generate and add unique configuration
@@ -284,11 +296,8 @@ public:
      * @details Write alphabet, q0, accepting configurations and draw NKA
      * @param [in] filename name of created file
      * @param [in] r radius of configurations circle
-     * @param [in] writeRegular if true make and write in file regular expression
      */
-    void createTexFileThisNKAWithoutCopy(const std::string& filename, double r, bool writeRegular = true);
-
-
+    void createTexFileThisNKAWithoutCopy(const std::string& filename, double r = 5);
 
     /**
      * add regular symbols {+, ^, *, (, ), 1} in alphabet
